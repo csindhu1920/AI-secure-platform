@@ -1,0 +1,21 @@
+2026-03-10 10:00:00 INFO  Application started
+2026-03-10 10:00:01 INFO  Database connection established at 192.168.1.100
+2026-03-10 10:00:05 INFO  User login: email=admin@company.com
+2026-03-10 10:00:05 DEBUG password=admin123
+2026-03-10 10:00:06 INFO  API initialized: api_key=sk-prod-xyz123456789012345678901
+2026-03-10 10:00:07 INFO  Auth token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWRtaW4ifQ.abc123def
+2026-03-10 10:00:10 ERROR NullPointerException at com.service.UserService.login(UserService.java:45)
+2026-03-10 10:00:10 ERROR   at com.service.AuthFilter.doFilter(AuthFilter.java:23)
+2026-03-10 10:00:10 ERROR   at org.apache.catalina.core.ApplicationFilterChain.java:193
+2026-03-10 10:01:00 WARN  Failed login attempt for user: root from 203.0.113.45
+2026-03-10 10:01:01 WARN  Failed login attempt for user: root from 203.0.113.45
+2026-03-10 10:01:02 WARN  Failed login attempt for user: root from 203.0.113.45
+2026-03-10 10:01:03 WARN  Authentication failed: invalid password for user root
+2026-03-10 10:01:04 ERROR Unauthorized access attempt from 203.0.113.45
+2026-03-10 10:02:00 INFO  Config loaded: debug=true verbose_logging=true
+2026-03-10 10:02:01 INFO  AWS credentials: AKIAIOSFODNN7EXAMPLE
+2026-03-10 10:02:01 INFO  AWS secret: aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+2026-03-10 10:05:00 INFO  Backup contact: support@company.com | 555-867-5309
+2026-03-10 10:05:01 INFO  SSN on file: 123-45-6789
+2026-03-10 10:05:02 INFO  Payment: 4111-1111-1111-1111 exp 12/26
+2026-03-10 10:10:00 INFO  Shutdown complete

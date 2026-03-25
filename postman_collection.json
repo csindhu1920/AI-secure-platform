@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "AI Secure Data Intelligence Platform",
+    "_postman_id": "ai-secure-v2",
+    "description": "Complete API collection for the AI Secure Data Intelligence Platform.\n\n## Setup:\n1. Run the server: `uvicorn backend.main:app --reload --port 8000`\n2. Import this collection into Postman\n3. All requests hit http://127.0.0.1:8000\n\n## Endpoints:\n- GET  /health\n- GET  /patterns\n- POST /analyze\n- POST /analyze/upload\n- POST /analyze/batch",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Status",
+      "item": [
+        {
+          "name": "Root - Service Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Returns service info and all available endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Check if server is running and whether API key is configured."
+          },
+          "response": [
+            {
+              "name": "Healthy Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"ok\",\n  \"api_key_set\": true,\n  \"ai_insights\": \"enabled\",\n  \"detection_types\": 12,\n  \"total_patterns\": 20\n}"
+            }
+          ]
+        },
+        {
+          "name": "List All Detection Patterns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/patterns",
+              "host": ["{{base_url}}"],
+              "path": ["patterns"]
+            },
+            "description": "Get all detection pattern types with their risk levels and scores."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analyze - Text",
+      "item": [
+        {
+          "name": "Analyze Clean Text",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"text\",\n  \"content\": \"User logged in successfully. Dashboard loaded. Request completed in 120ms.\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Analyze clean text — expect risk_level: safe, 0 findings."
+          }
+        },
+        {
+          "name": "Analyze Text with PII",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"text\",\n  \"content\": \"Customer record: John Doe, email=john.doe@company.com, phone=555-867-5309, SSN=123-45-6789, CC=4111-1111-1111-1111\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Text containing PII: email, phone, SSN, credit card."
+          }
+        },
+        {
+          "name": "Analyze SQL Query",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"sql\",\n  \"content\": \"SELECT * FROM users WHERE email='admin@corp.com' AND password='admin123'\\nINSERT INTO audit_log VALUES ('admin@corp.com', 'login', '192.168.1.45')\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "SQL query with embedded password and email."
+          }
+        },
+        {
+          "name": "Analyze Chat Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"chat\",\n  \"content\": \"User: Hey, my API key is sk-prod-abcdefghijklmnopqrstuvwxyz123456\\nSupport Bot: Got it, I'll log that for you: password=backup_pass_999\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": true\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Chat log with API key and password — block_high_risk enabled."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze - Logs",
+      "item": [
+        {
+          "name": "Analyze Log - Credentials Exposed",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"log\",\n  \"content\": \"2026-03-10 10:00:01 INFO User login email=admin@company.com\\npassword=admin123\\napi_key=sk-prod-xyz123456789012345678901\\nBearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWRtaW4ifQ.abc123def456ghi789\\n2026-03-10 10:00:02 ERROR stack trace: NullPointerException at service.java:45\\n2026-03-10 10:01:45 WARN Failed login attempt for user root\\n2026-03-10 10:01:46 WARN Failed login attempt for user root\\n2026-03-10 10:01:47 WARN Failed login attempt for user root\\ndebug=true verbose_logging=true\\naws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": false,\n    \"log_analysis\": true\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Full log with: API key, password, JWT, AWS credential, stack trace, brute force, debug leak. This is the main demo — expect CRITICAL risk."
+          }
+        },
+        {
+          "name": "Analyze Log - Brute Force Only",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"log\",\n  \"content\": \"2026-03-10 10:01:00 WARN Failed login attempt for user admin\\n2026-03-10 10:01:01 WARN Failed login attempt for user admin\\n2026-03-10 10:01:02 WARN Failed login attempt for user admin\\n2026-03-10 10:01:03 WARN Authentication failed: invalid password for user admin\\n2026-03-10 10:01:04 ERROR Unauthorized access from 192.168.1.105\",\n  \"options\": {\n    \"mask\": false,\n    \"block_high_risk\": true\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Log showing repeated failed login attempts — brute force detection."
+          }
+        },
+        {
+          "name": "Analyze Log - AWS + JWT",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"log\",\n  \"content\": \"[CONFIG] Loading credentials...\\nAKIAIOSFODNN7EXAMPLE\\naws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\\n[AUTH] Token issued: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoic3VwZXJhZG1pbiJ9.xyz\\n[SYS] debug=true\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Log with AWS key, JWT, and debug leak."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze - Options Testing",
+      "item": [
+        {
+          "name": "Test mask=false (raw values returned)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"text\",\n  \"content\": \"password=hunter2 api_key=sk-test-abcdefghijklmnop\",\n  \"options\": {\n    \"mask\": false,\n    \"block_high_risk\": false\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "mask=false: masked_content will be null, values are not redacted."
+          }
+        },
+        {
+          "name": "Test block_high_risk=true",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"log\",\n  \"content\": \"password=SuperSecret123 api_key=sk-prod-xyz123456789012345678901\",\n  \"options\": {\n    \"mask\": true,\n    \"block_high_risk\": true\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "block_high_risk=true: action will be 'blocked' for critical content."
+          }
+        },
+        {
+          "name": "Test Empty Content (400 Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input_type\": \"text\",\n  \"content\": \"\",\n  \"options\": {}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Should return HTTP 400 — content cannot be empty."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze - File Upload",
+      "item": [
+        {
+          "name": "Upload File (form-data)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select your .log or .txt file here"
+                },
+                {
+                  "key": "mask",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "block_high_risk",
+                  "value": "false",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze/upload",
+              "host": ["{{base_url}}"],
+              "path": ["analyze", "upload"]
+            },
+            "description": "## File Upload\n\n### Steps in Postman:\n1. Body → form-data\n2. Key `file` → change type to **File** → select your .log file\n3. Key `mask` → `true`\n4. Key `block_high_risk` → `false`\n5. Send\n\n### Supported: .log .txt .sql .csv .json"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze - Batch",
+      "item": [
+        {
+          "name": "Batch Analyze (2 items)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"input_type\": \"text\",\n    \"content\": \"User accessed dashboard from 192.168.1.1\",\n    \"options\": { \"mask\": true }\n  },\n  {\n    \"input_type\": \"log\",\n    \"content\": \"password=admin123\\napi_key=sk-prod-xyz123456789012345678901\",\n    \"options\": { \"mask\": true, \"block_high_risk\": false }\n  }\n]",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze/batch",
+              "host": ["{{base_url}}"],
+              "path": ["analyze", "batch"]
+            },
+            "description": "Analyze 2 items in one call. Returns array of results."
+          }
+        },
+        {
+          "name": "Batch - 3 different input types",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"input_type\": \"text\",\n    \"content\": \"Customer email: billing@acme.com phone: 415-555-0123\",\n    \"options\": { \"mask\": true }\n  },\n  {\n    \"input_type\": \"sql\",\n    \"content\": \"SELECT * FROM users WHERE password = 'hardcoded_pass'\",\n    \"options\": { \"mask\": true }\n  },\n  {\n    \"input_type\": \"log\",\n    \"content\": \"AKIAIOSFODNN7EXAMPLE loaded from config\\ndebug=true\",\n    \"options\": { \"mask\": true }\n  }\n]",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/analyze/batch",
+              "host": ["{{base_url}}"],
+              "path": ["analyze", "batch"]
+            },
+            "description": "Batch with text, SQL, and log — tests multi-input handling."
+          }
+        }
+      ]
+    }
+  ]
+}

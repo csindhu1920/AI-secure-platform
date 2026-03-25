@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "▶ Run FastAPI Server",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["backend.main:app", "--reload", "--host", "127.0.0.1", "--port", "8000"],
+      "jinja": true,
+      "justMyCode": true,
+      "env": {
+        "ANTHROPIC_API_KEY": "key"
+      }
+    },
+    {
+      "name": "🧪 Run All Tests",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/", "-v", "--tb=short"],
+      "justMyCode": false
+    }
+  ]
+}
